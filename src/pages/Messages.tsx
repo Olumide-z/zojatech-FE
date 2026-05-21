@@ -4,8 +4,7 @@ import {
   Edit2,
   Heart,
   Bell,
-  ChevronLeft,
-  Trash2
+  ChevronLeft
 } from 'lucide-react';
 import DashboardLayout from '../components/dashboard/DashboardLayout';
 

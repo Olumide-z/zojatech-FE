@@ -1,5 +1,5 @@
 import React from 'react';
-import { FaFacebookF, FaInstagram, FaLinkedinIn } from 'react-icons/fa';
+import { FaFacebookF, FaInstagram } from 'react-icons/fa';
 import { FaLinkedin } from 'react-icons/fa6';
 
 interface RevenueItem {

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Heart, MessageSquare, Share2 } from 'lucide-react';
+import { Heart } from 'lucide-react';
 
 const posts = [
   {

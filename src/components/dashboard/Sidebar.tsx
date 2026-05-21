@@ -5,7 +5,6 @@ import {
   X,
 } from 'lucide-react';
 import { NAV_ITEMS } from '../../utils/constants';
-import { TbLayoutSidebarLeftCollapse } from 'react-icons/tb';
 
 interface SidebarProps {
   collapsed: boolean;
@@ -67,7 +66,7 @@ const SidebarContent: React.FC<{
   onToggleCollapse?: () => void;
   onMobileClose?: () => void;
   isMobile?: boolean;
-}> = ({ collapsed, onToggleCollapse, onMobileClose, isMobile }) => (
+}> = ({ collapsed, onMobileClose, isMobile }) => (
   <div className="h-full flex flex-col font-lexend">
     {/* Logo + close / collapse controls */}
     <div className={`flex items-center h-16 px-4 shrink-0 ${!isMobile ? 'justify-between pl-[2.5rem]' : 'justify-between'}`}>
