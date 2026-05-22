@@ -11,7 +11,7 @@ export const SearchInput = () => {
                 <input
                     type="text"
                     placeholder="Search"
-                    className="w-full pl-9 pr-4 py-2 text-[13px] bg-[#ffff] rounded-[12px] text-body-action placeholder-body-light-grey focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all"
+                    className="w-full pl-9 pr-4 py-2 text-base bg-[#ffff] rounded-[12px] text-body-action placeholder-body-light-grey focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all"
                 />
             </div>
         </div>

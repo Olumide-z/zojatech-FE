@@ -6,6 +6,7 @@ import Button from '../common/Button';
 import Toast from '../common/Toast';
 import { useRegister } from '../../hooks/useAuth';
 import type { ToastProps } from '../common/Toast';
+import SuccessState from '../common/SuccessState';
 
 
 type ToastItem = Omit<ToastProps, 'onClose'>;
@@ -24,6 +25,8 @@ const SignupStep2: React.FC = () => {
   // Focus states to align First Name & Last Name dynamic margins
   const [isFirstNameFocused, setIsFirstNameFocused] = useState(false);
   const [isLastNameFocused, setIsLastNameFocused] = useState(false);
+  // Success state after registration
+  const [showSuccess, setShowSuccess] = useState(false);
 
   // Form error state
   const [errors, setErrors] = useState<{
@@ -73,8 +76,11 @@ const SignupStep2: React.FC = () => {
   // Validations
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   const isEmailValid = emailRegex.test(email);
-  const isPasswordValid =
-    password.length >= 8 && /[a-zA-Z]/.test(password) && /[0-9]/.test(password);
+  const passwordRegex =
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>_\-\\[\]/`~+=;'']).{8,}$/;
+
+  const isPasswordValid = passwordRegex.test(password);
+
   const isFormValid =
     firstName.trim().length > 0 &&
     lastName.trim().length > 0 &&
@@ -96,12 +102,11 @@ const SignupStep2: React.FC = () => {
     if (!isEmailValid) newErrors.email = 'Please enter a valid email address';
     if (!isPasswordValid)
       newErrors.password =
-        'Password must be at least 8 characters and contain both letters and numbers';
+        'Password must be at least 8 characters and include an uppercase letter, lowercase letter, number, and symbol';
 
     setErrors(newErrors);
     if (Object.keys(newErrors).length > 0) return;
 
-    // Call the register API
     const result = await register({
       first_name: firstName.trim(),
       last_name: lastName.trim(),
@@ -110,15 +115,28 @@ const SignupStep2: React.FC = () => {
     });
 
     if (result.success) {
-      // Store email for the verify page
-      localStorage.setItem('auth_user', JSON.stringify({ email: email.trim() }));
+      localStorage.setItem(
+        'auth_user',
+        JSON.stringify({
+          email: email.trim(),
+          token: result.token,
+        })
+      );
+
+      if (result.token) {
+        localStorage.setItem('token', result.token);
+      }
+
+      // Save email separately for verification success screen
+      localStorage.setItem('email', email.trim());
+
       addToast({
         type: 'success',
         title: 'Account created!',
         description: result.message,
       });
-      // Navigate to verify page after a short delay so toast is visible
-      setTimeout(() => navigate('/verify'), 1200);
+
+      setShowSuccess(true);
     } else {
       addToast({
         type: 'error',
@@ -215,11 +233,16 @@ const SignupStep2: React.FC = () => {
           onChange={(e) => {
             const val = e.target.value;
             setPassword(val);
-            const isValid =
-              val.length >= 8 && /[a-zA-Z]/.test(val) && /[0-9]/.test(val);
-            if (errors.password && (!val || isValid)) {
-              setErrors((prev) => ({ ...prev, password: undefined }));
-            }
+
+            const isValid = passwordRegex.test(val);
+
+            setErrors((prev) => ({
+              ...prev,
+              password:
+                !val || isValid
+                  ? undefined
+                  : 'Password must be at least 8 characters, include 1 uppercase letter, 1 number, and 1 symbol',
+            }));
           }}
           onBlur={() => {
             if (password && !isPasswordValid) {
@@ -239,10 +262,11 @@ const SignupStep2: React.FC = () => {
         {/* Submit Register Button */}
         <Button
           type="submit"
-          disabled={!isFormValid || isLoading}
+          disabled={!isFormValid}
+          isLoading={isLoading}
           className="mt-8"
         >
-          {isLoading ? 'Creating account...' : 'Create account'}
+          Create account
         </Button>
 
         {/* Terms policy */}
@@ -266,6 +290,19 @@ const SignupStep2: React.FC = () => {
           </Link>
         </div>
       </form>
+
+      {showSuccess && (
+        <SuccessState
+          title="Check your mailbox !"
+          description={`We’ve sent an email to ${localStorage.getItem('email') || email
+            } with an OTP to confirm your account. Check your inbox to activate your account.`}
+          imageSrc="/assets/sent-email.svg"
+          onClickEvent={() => {
+            navigate('/verify');
+            setShowSuccess(false);
+          }}
+        />
+      )}
     </>
   );
 };

@@ -24,13 +24,20 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
+
 api.interceptors.response.use(
   (response) => {
     console.log('RESPONSE:', response);
     return response;
   },
   (error) => {
-    console.log('AXIOS ERROR:', error);
+    console.log('AXIOS ERROR:', {
+      message: error.message,
+      code: error.code,
+      response: error.response,
+      request: error.request,
+    });
+
     return Promise.reject(error);
   }
 );

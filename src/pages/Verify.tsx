@@ -1,11 +1,32 @@
 import React, { useState, useRef, useEffect } from 'react';
 import AuthLayout from '@/components/auth/AuthLayout';
 import Button from '@/components/common/Button';
+import SuccessState from '@/components/common/SuccessState';
+import { useNavigate } from 'react-router-dom';
+import Toast from '@/components/common/Toast';
+import type { ToastProps } from '@/components/common/Toast';
+import { useVerifyOtp, useResendToken } from '@/hooks/useAuth';
 
 const Verify: React.FC = () => {
   const [otp, setOtp] = useState<string[]>(['', '', '', '']);
-  const [email, setEmail] = useState('seyi@zojatech.com');
+  const [email, setEmail] = useState('');
+  const navigate = useNavigate();
+  const { verifyOtp, isLoading: isVerifying } = useVerifyOtp();
+  const { resendToken, isLoading: isResending } = useResendToken();
+  // Toasts
+  type ToastItem = Omit<ToastProps, 'onClose'>;
+  const [toasts, setToasts] = useState<ToastItem[]>([]);
 
+  const addToast = (toast: Omit<ToastItem, 'id'>) => {
+    const id = crypto.randomUUID();
+    setToasts((prev) => [...prev, { ...toast, id }]);
+  };
+
+  const removeToast = (id: string) => {
+    setToasts((prev) => prev.filter((t) => t.id !== id));
+  };
+
+  const [verified, setVerified] = useState(false);
   // Input refs for automatic focus shifting
   const inputRefs = [
     useRef<HTMLInputElement>(null),
@@ -15,18 +36,10 @@ const Verify: React.FC = () => {
   ];
 
   useEffect(() => {
-    // Try to load simulated signup/login user email
-    const storedUser = localStorage.getItem('auth_user');
-    if (storedUser) {
-      try {
-        const user = JSON.parse(storedUser);
-        if (user && user.email) {
-          setEmail(user.email);
-        }
-      } catch (err) {
-        console.error('Failed to parse auth_user email', err);
-      }
-    }
+    const storedEmail = localStorage.getItem('email');
+    if (storedEmail) {
+      setEmail(storedEmail);
+    } 
   }, []);
 
   const handleChange = (index: number, value: string) => {
@@ -95,19 +108,43 @@ const Verify: React.FC = () => {
     if (!isFormValid) return;
 
     const fullCode = otp.join('');
-    alert(`Email verified successfully with code: ${fullCode}`);
 
-    // Simulate successful login/verification
-    localStorage.setItem('auth_verified', 'true');
-    window.location.href = '/dashboard';
+    (async () => {
+      const res = await verifyOtp({ otp: fullCode });
+
+      if (res.success) {
+        localStorage.setItem('auth_verified', 'true');
+        addToast({ type: 'success', title: 'Verification successful', description: res.message });
+        setVerified(true);
+      } else {
+        addToast({ type: 'error', title: 'Verification failed', description: res.message });
+      }
+    })();
   };
 
   const handleResend = () => {
-    alert(`A new four digit OTP code has been successfully resent to ${email}`);
+    (async () => {
+      const res = await resendToken({ email });
+
+      if (res.success) {
+        addToast({ type: 'success', title: 'OTP resent', description: res.message });
+      } else {
+        addToast({ type: 'error', title: 'Resend failed', description: res.message });
+      }
+    })();
   };
 
   return (
-    <AuthLayout maxWidth='445px'>
+    <AuthLayout maxWidth="445px">
+      {/* Toast stack – fixed bottom-right */}
+      <div className="fixed bottom-6 right-6 z-50 flex flex-col gap-3 items-end pointer-events-none">
+        {toasts.map((toast) => (
+          <div key={toast.id} className="pointer-events-auto">
+            <Toast {...toast} onClose={removeToast} />
+          </div>
+        ))}
+      </div>
+
       <form onSubmit={handleSubmit} className="flex flex-col gap-1.5 font-sans animate-fade-in">
         <div className="mb-4">
           <h2 className="text-[20px] sm:text-[24px] font-semibold text-body-action">
@@ -143,7 +180,8 @@ const Verify: React.FC = () => {
         {/* Submit Confirm Button */}
         <Button
           type="submit"
-          disabled={!isFormValid}
+          disabled={!isFormValid || isVerifying}
+          isLoading={isVerifying}
           className="mt-6 w-fit! px-12 py-3.5"
         >
           Confirm code
@@ -155,12 +193,23 @@ const Verify: React.FC = () => {
           <button
             type="button"
             onClick={handleResend}
+            disabled={isResending}
             className="text-primary font-medium hover:underline cursor-pointer focus:outline-none"
           >
             Resend
           </button>
         </div>
+
       </form>
+
+      {verified && (
+        <SuccessState
+          title="Email verified !"
+          description="The verified email address will be associated with your account. Click on the button below to continue"
+          imageSrc="/assets/verify-success.svg"
+          onClickEvent={() => navigate('/portfolio')}
+        />
+      )}
     </AuthLayout>
   );
 };

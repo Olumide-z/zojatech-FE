@@ -29,7 +29,7 @@ export const ChatInputBar: React.FC<ChatInputBarProps> = ({
   const QUICK_EMOJIS = ['👍', '❤️', '🔥', '🎉', '😀', '🙏', '💯', '🚀'];
 
   return (
-    <div className="p-4 md:p-6 bg-white border-t border-[#E9E9EB]/80 shrink-0 relative">
+    <div className="p-4 md:p-6 bg-white border-t border-[#E9E9EB]/80 shrink-0 relative font-lexend">
 
       {/* Quick Reply Toolbar (Emojis list) */}
       {showEmojiPicker && (
@@ -79,7 +79,7 @@ export const ChatInputBar: React.FC<ChatInputBarProps> = ({
             value={inputText}
             onChange={(e) => onChangeText(e.target.value)}
             placeholder="Write Something..."
-            className="flex-1 bg-transparent text-[13.5px] text-body-black placeholder-[#818187] focus:outline-none py-1.5 font-sans"
+            className="flex-1 bg-transparent text-base text-body-black placeholder-[#818187] focus:outline-none py-1.5 font-sans"
             disabled={isRecording}
           />
 
@@ -95,7 +95,7 @@ export const ChatInputBar: React.FC<ChatInputBarProps> = ({
             </button>
             <button
               type="button"
-              className="p-1.5 rounded-full text-body-grey hover:text-primary transition-colors cursor-pointer"
+              className="p-1.5 sm:block hidden rounded-full text-body-grey hover:text-primary transition-colors cursor-pointer"
               title="Send Photo"
               onClick={onSendMockPhoto}
             >
@@ -104,7 +104,7 @@ export const ChatInputBar: React.FC<ChatInputBarProps> = ({
             <button
               type="button"
               onClick={onToggleEmojiPicker}
-              className={`p-1.5 rounded-full text-body-grey hover:text-primary transition-colors cursor-pointer ${showEmojiPicker ? 'text-primary' : ''}`}
+              className={`p-1.5 sm:block hidden rounded-full text-body-grey hover:text-primary transition-colors cursor-pointer ${showEmojiPicker ? 'text-primary' : ''}`}
               title="Emojis"
             >
               <Smile size={16} />
@@ -115,7 +115,7 @@ export const ChatInputBar: React.FC<ChatInputBarProps> = ({
         {/* Send Button */}
         <button
           type="submit"
-          className="w-12 h-12 rounded-full bg-primary hover:bg-[#E07600] active:scale-95 text-white flex items-center justify-center shadow-lg hover:shadow-primary/20 transition-all duration-200 cursor-pointer shrink-0"
+          className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-primary hover:bg-[#E07600] active:scale-95 text-white flex items-center justify-center shadow-lg hover:shadow-primary/20 transition-all duration-200 cursor-pointer shrink-0"
           title="Send Message"
         >
           <Send size={18} className="translate-x-[1px] -translate-y-[1px]" />

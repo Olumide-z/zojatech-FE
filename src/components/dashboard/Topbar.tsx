@@ -21,6 +21,8 @@ const Topbar: React.FC<TopbarProps> = ({
             ? 'translate-y-0 opacity-100'
             : '-translate-y-full opacity-0 pointer-events-none'
           }`}
+        role="dialog"
+        aria-hidden={!showMobileSearch}
       >
         <div className="flex items-center gap-3">
           <div className="flex-1">
@@ -36,7 +38,7 @@ const Topbar: React.FC<TopbarProps> = ({
         </div>
       </div>
 
-      <header className="h-16 bg-[#fafafa] flex justify-between items-center px-4 md:px-6 gap-4 shrink-0 z-20 font-lexend">
+      <header className="sticky top-0 z-40 h-16 bg-white/95 backdrop-blur-sm flex justify-between items-center px-4 md:px-6 gap-4 shrink-0 font-lexend">
         {/* Left section */}
         <div className="flex items-center gap-3 shrink-0">
           {/* Mobile hamburger */}

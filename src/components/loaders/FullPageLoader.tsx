@@ -9,6 +9,7 @@ const FullPageLoader = () => {
                         src="/assets/logo.svg"
                         alt="Logo"
                         className="object-contain w-24 h-24"
+                        loading="lazy"
                     />
                 </div>
 
